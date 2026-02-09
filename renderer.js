@@ -1,14 +1,13 @@
 let padIndex = null;
 let started = false;
 
-// スタートボタン（スマホ対策）
 const startBtn = document.getElementById("start");
+
 startBtn.addEventListener("click", () => {
   started = true;
   startBtn.style.display = "none";
-  console.log("ゲーム開始");
-
-  // フルスクリーン（できる端末だけ）
+  document.body.style.background = "#222";
+  document.body.innerHTML = "<h1>🎮 ゲーム中</h1><p>プロコン操作を確認中…</p>";
   document.documentElement.requestFullscreen?.();
 });
 
@@ -30,15 +29,10 @@ function loop() {
     pad.buttons.forEach((b, i) => {
       if (b.pressed) {
         console.log("押されたボタン番号:", i);
+        document.body.innerHTML =
+          `<h1>🎮 ゲーム中</h1><p>ボタン ${i} が押された！</p>`;
       }
     });
-
-    // 左スティック（移動用）
-    const x = pad.axes[0];
-    const y = pad.axes[1];
-    if (Math.abs(x) > 0.2 || Math.abs(y) > 0.2) {
-      console.log("スティック:", x.toFixed(2), y.toFixed(2));
-    }
   }
 
   requestAnimationFrame(loop);
