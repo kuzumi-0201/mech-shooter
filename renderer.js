@@ -36,11 +36,15 @@ function init3D() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // 光
-  scene.add(new THREE.DirectionalLight(0xffffff, 1).position.set(5, 10, 5));
-  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  // ===== 光（正しい書き方）=====
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  dirLight.position.set(5, 10, 5);
+  scene.add(dirLight);
 
-  // 床
+  const ambLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambLight);
+
+  // ===== 床 =====
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(50, 50),
     new THREE.MeshStandardMaterial({ color: 0x228b22 })
@@ -48,14 +52,15 @@ function init3D() {
   floor.rotation.x = -Math.PI / 2;
   scene.add(floor);
 
-  // ===== プレイヤー（キャラ）=====
+  // ===== プレイヤー（必ず見える）=====
   player = new THREE.Mesh(
     new THREE.BoxGeometry(1, 2, 1),
     new THREE.MeshStandardMaterial({ color: 0x0000ff })
   );
-  player.position.y = 1;
+  player.position.set(0, 1, 0); // 床の上
   scene.add(player);
 
+  // リサイズ対応
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -82,8 +87,8 @@ function updatePlayer() {
   if (!pad) return;
 
   const speed = 0.15;
-  const x = pad.axes[0]; // 左スティック左右
-  const y = pad.axes[1]; // 左スティック上下
+  const x = pad.axes[0];
+  const y = pad.axes[1];
 
   if (Math.abs(x) > 0.15) player.position.x += x * speed;
   if (Math.abs(y) > 0.15) player.position.z += y * speed;
