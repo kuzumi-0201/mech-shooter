@@ -1,22 +1,24 @@
-// ★ Three.js 読み込み確認
+// ==== Three.js 確認 ====
 alert("THREE = " + typeof THREE);
 
-let scene, camera, renderer;
+let scene, camera, renderer, player;
 
-// ===== スタートボタン =====
+// ==== スタート ====
 const startBtn = document.getElementById("start");
 startBtn.addEventListener("click", () => {
   startBtn.style.display = "none";
-  init3D();
+  init();
   animate();
 });
 
-function init3D() {
-  console.log("init3D start");
+function init() {
+  console.log("init start");
 
+  // シーン
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x222222);
+  scene.background = new THREE.Color(0x87ceeb);
 
+  // カメラ
   camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
@@ -26,24 +28,25 @@ function init3D() {
   camera.position.set(0, 3, 6);
   camera.lookAt(0, 0, 0);
 
+  // レンダラー
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // 光（最小構成）
+  // 光
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(3, 5, 3);
   scene.add(light);
 
-  // ★ テスト用プレイヤー（赤い箱）
-  const box = new THREE.Mesh(
+  // ★ プレイヤー（赤い箱）
+  player = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1),
     new THREE.MeshStandardMaterial({ color: 0xff0000 })
   );
-  box.position.set(0, 0.5, 0);
-  scene.add(box);
+  player.position.set(0, 0.5, 0);
+  scene.add(player);
 
-  console.log("box added");
+  console.log("player added");
 }
 
 function animate() {
