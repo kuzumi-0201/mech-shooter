@@ -3,6 +3,11 @@ let player;
 let padIndex = null;
 const colliders = [];
 
+// カメラ制御用
+let camYaw = 0;    // 左右回転
+let camPitch = 0;  // 上下回転
+const camDistance = 12;
+
 // スタート
 document.getElementById("start").addEventListener("click", () => {
   document.getElementById("start").style.display = "none";
@@ -13,24 +18,21 @@ document.getElementById("start").addEventListener("click", () => {
 // ゲームパッド
 window.addEventListener("gamepadconnected", (e) => {
   padIndex = e.gamepad.index;
+  console.log("gamepad connected");
 });
 
 // 初期化
 function init() {
-  // シーン
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x87ceeb); // 青空（見やすさ優先）
+  scene.background = new THREE.Color(0x87ceeb);
 
-  // カメラ（城塞が必ず見える位置）
   camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
     0.1,
-    200
+    300
   );
-  camera.position.set(0, 8, 15);
 
-  // レンダラー
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
@@ -42,9 +44,9 @@ function init() {
   light.position.set(10, 20, 10);
   scene.add(light);
 
-  // 地面（明るい）
+  // 地面
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(100, 100),
+    new THREE.PlaneGeometry(200, 200),
     new THREE.MeshStandardMaterial({
       color: 0x55aa55,
       side: THREE.DoubleSide
@@ -55,7 +57,7 @@ function init() {
 
   // プレイヤー（人形）
   player = createDoll();
-  player.position.set(0, 0, 8);
+  player.position.set(0, 0, 10);
   scene.add(player);
 
   // 城塞
@@ -64,8 +66,7 @@ function init() {
 
 // 人形
 function createDoll() {
-  const group = new THREE.Group();
-
+  const g = new THREE.Group();
   const mat = new THREE.MeshStandardMaterial({ color: 0xff5555 });
 
   const body = new THREE.Mesh(
@@ -80,15 +81,14 @@ function createDoll() {
   );
   head.position.y = 2.4;
 
-  group.add(body, head);
-  return group;
+  g.add(body, head);
+  return g;
 }
 
 // 城塞
 function createFortress() {
   const mat = new THREE.MeshStandardMaterial({ color: 0x8888ff });
 
-  // 中央建物
   const core = new THREE.Mesh(
     new THREE.BoxGeometry(6, 4, 6),
     mat
@@ -97,12 +97,11 @@ function createFortress() {
   scene.add(core);
   colliders.push(core);
 
-  // サブ塔
   const tower = new THREE.Mesh(
     new THREE.BoxGeometry(3, 5, 3),
     mat
   );
-  tower.position.set(-7, 2.5, 0);
+  tower.position.set(-8, 2.5, 0);
   scene.add(tower);
   colliders.push(tower);
 }
@@ -111,28 +110,44 @@ function createFortress() {
 function animate() {
   requestAnimationFrame(animate);
 
-  let dx = 0, dz = 0;
+  let moveX = 0, moveZ = 0;
+  let lookX = 0, lookY = 0;
 
   if (padIndex !== null) {
     const pad = navigator.getGamepads()[padIndex];
     if (pad) {
-      dx = pad.axes[0] * 0.15;
-      dz = pad.axes[1] * 0.15;
+      // 左スティック：移動
+      moveX = pad.axes[0] * 0.15;
+      moveZ = pad.axes[1] * 0.15;
+
+      // ★ 右スティック：視点
+      lookX = pad.axes[2] * 0.04;
+      lookY = pad.axes[3] * 0.04;
     }
   }
 
+  // プレイヤー移動
   const next = player.position.clone();
-  next.x += dx;
-  next.z += dz;
+  next.x += moveX;
+  next.z += moveZ;
 
   if (!hit(next)) {
     player.position.copy(next);
   }
 
-  // カメラ追従
-  camera.position.x = player.position.x;
-  camera.position.z = player.position.z + 12;
-  camera.position.y = 8;
+  // カメラ回転
+  camYaw -= lookX;
+  camPitch -= lookY;
+  camPitch = Math.max(-1.2, Math.min(0.3, camPitch)); // 上下制限
+
+  // カメラ位置計算
+  camera.position.x =
+    player.position.x + Math.sin(camYaw) * camDistance;
+  camera.position.z =
+    player.position.z + Math.cos(camYaw) * camDistance;
+  camera.position.y =
+    player.position.y + 4 + camPitch * 5;
+
   camera.lookAt(player.position);
 
   renderer.render(scene, camera);
