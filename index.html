@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>3D RPG</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>My Game</title>
   <style>
     body {
       margin: 0;
-      overflow: hidden;
       background: black;
-    }
-    #info {
-      position: fixed;
-      top: 10px;
-      left: 10px;
       color: white;
-      z-index: 10;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #start {
+      padding: 20px 40px;
+      font-size: 24px;
     }
   </style>
 </head>
 <body>
-  <div id="info">🎮 Proコンで操作してね</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
-  <script src="main.js"></script>
+<button id="start">▶ タップして開始</button>
+
+<script src="renderer.js"></script>
 </body>
 </html>
