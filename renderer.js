@@ -1,4 +1,3 @@
-alert(typeof THREE);
 const startBtn = document.getElementById("start");
 
 startBtn.onclick = () => {
