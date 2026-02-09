@@ -2,21 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>My RPG</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="style.css">
+  <title>3D Gamepad Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; overflow: hidden; background: black; }
+    #info {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 14px;
+      z-index: 10;
+    }
+  </style>
 </head>
 <body>
+  <div id="info">🎮 Proコンを接続してスティックを動かしてね</div>
 
-  <!-- タイトル画面 -->
-  <div id="titleScreen">
-    <h1>MY RPG</h1>
-    <button id="startBtn">▶ はじめる</button>
-  </div>
-
-  <!-- ゲーム画面 -->
-  <canvas id="gameCanvas" width="800" height="450"></canvas>
-
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
