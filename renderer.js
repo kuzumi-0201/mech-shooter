@@ -1,3 +1,6 @@
+// Three.js が読み込めているか確認
+alert(typeof THREE); // object ならOK
+
 let scene, camera, renderer;
 let started = false;
 
@@ -8,6 +11,8 @@ startBtn.addEventListener("click", () => {
   started = true;
   init3D();
   animate();
+
+  // フルスクリーン（できる端末だけ）
   document.documentElement.requestFullscreen?.();
 });
 
@@ -23,7 +28,7 @@ function init3D() {
     0.1,
     1000
   );
-  camera.position.set(0, 5, 10);
+  camera.position.set(0, 6, 10);
   camera.lookAt(0, 0, 0);
 
   // レンダラー
@@ -45,7 +50,7 @@ function init3D() {
   floor.rotation.x = -Math.PI / 2;
   scene.add(floor);
 
-  // 箱（建物・木の代わり）
+  // 箱（建物・オブジェクト）
   const box = new THREE.Mesh(
     new THREE.BoxGeometry(2, 2, 2),
     new THREE.MeshStandardMaterial({ color: 0x8b4513 })
@@ -53,7 +58,7 @@ function init3D() {
   box.position.set(0, 1, 0);
   scene.add(box);
 
-  // 画面リサイズ対応
+  // 画面サイズ変更対応
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
