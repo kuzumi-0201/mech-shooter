@@ -2,20 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>3D RPG</title>
+  <title>Near Future RPG</title>
 
-  <!-- スマホ向け -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!-- 横画面固定 -->
+  <meta name="viewport"
+        content="width=device-width,
+                 height=device-height,
+                 initial-scale=1.0,
+                 user-scalable=no">
 
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: black;
+      touch-action: none;
     }
 
     #start {
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: black;
       color: white;
@@ -29,13 +34,9 @@
 </head>
 <body>
 
-  <!-- スタート画面 -->
-  <div id="start">▶ タップして開始</div>
+  <div id="start">▶ タップして開始（横向き推奨）</div>
 
-  <!-- Three.js（必ず先） -->
   <script src="three.min.js"></script>
-
-  <!-- ゲーム本体 -->
   <script src="renderer.js"></script>
 </body>
 </html>
