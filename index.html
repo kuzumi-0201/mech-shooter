@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>My Game</title>
+  <title>3D RPG</title>
   <style>
     body {
       margin: 0;
+      overflow: hidden;
       background: black;
       color: white;
-      font-size: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
     }
     #start {
-      padding: 20px 40px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       font-size: 24px;
+      padding: 20px 40px;
+      z-index: 10;
     }
   </style>
 </head>
@@ -25,6 +26,8 @@
 
 <button id="start">▶ タップして開始</button>
 
+<!-- Three.js -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script src="renderer.js"></script>
 </body>
 </html>
