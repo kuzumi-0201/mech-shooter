@@ -2,32 +2,40 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>3D RPG</title>
+  <title>3D RPG Test</title>
+
+  <!-- スマホ横向き・全画面向け -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background: black;
     }
+
     #start {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      inset: 0;
+      background: black;
+      color: white;
       font-size: 24px;
-      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 10;
     }
   </style>
 </head>
 <body>
 
-<button id="start">▶ タップして開始</button>
+  <!-- スタート画面 -->
+  <div id="start">▶ タップして開始</div>
 
-<!-- ★順番超重要 -->
-<script src="three.min.js"></script>
-<script src="renderer.js"></script>
+  <!-- ★ Three.js 本体 → 必ず先 -->
+  <script src="three.min.js"></script>
 
+  <!-- ★ ゲーム処理 -->
+  <script src="renderer.js"></script>
 </body>
 </html>
