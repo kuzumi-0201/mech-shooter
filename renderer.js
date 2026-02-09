@@ -1,11 +1,11 @@
-// ==== Three.js 読み込み確認 ====
+// Three.js 読み込み確認
 alert("THREE = " + typeof THREE);
 
 let scene, camera, renderer;
 let player;
 let padIndex = null;
 
-// ==== スタートボタン ====
+// スタートボタン
 const startBtn = document.getElementById("start");
 startBtn.addEventListener("click", () => {
   startBtn.style.display = "none";
@@ -13,13 +13,13 @@ startBtn.addEventListener("click", () => {
   animate();
 });
 
-// ==== ゲームパッド接続 ====
+// ゲームパッド接続
 window.addEventListener("gamepadconnected", (e) => {
   padIndex = e.gamepad.index;
   console.log("Gamepad connected");
 });
 
-// ==== 初期化 ====
+// 初期化
 function init() {
   // シーン
   scene = new THREE.Scene();
@@ -32,7 +32,7 @@ function init() {
     0.1,
     100
   );
-  camera.position.set(0, 3, 6);
+  camera.position.set(0, 4, 8);
 
   // レンダラー
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,12 +47,16 @@ function init() {
   const ambient = new THREE.AmbientLight(0xffffff, 0.4);
   scene.add(ambient);
 
-  // 地面
+  // ★ 床（ここが修正ポイント）
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(50, 50),
-    new THREE.MeshStandardMaterial({ color: 0x228b22 })
+    new THREE.MeshStandardMaterial({
+      color: 0x228b22,
+      side: THREE.DoubleSide // ← 超重要
+    })
   );
   ground.rotation.x = -Math.PI / 2;
+  ground.position.y = 0;
   scene.add(ground);
 
   // プレイヤー（赤い箱）
@@ -72,7 +76,7 @@ function init() {
   scene.add(block);
 }
 
-// ==== メインループ ====
+// メインループ
 function animate() {
   requestAnimationFrame(animate);
 
