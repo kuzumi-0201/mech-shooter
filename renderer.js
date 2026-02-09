@@ -1,27 +1,29 @@
-// Three.js が読み込めているか確認
-alert(typeof THREE); // object ならOK
-
 let scene, camera, renderer;
+let player;
 let started = false;
+let padIndex = null;
 
-// スタートボタン
+// ===== スタートボタン =====
 const startBtn = document.getElementById("start");
 startBtn.addEventListener("click", () => {
   startBtn.style.display = "none";
   started = true;
   init3D();
   animate();
-
-  // フルスクリーン（できる端末だけ）
   document.documentElement.requestFullscreen?.();
 });
 
-function init3D() {
-  // シーン
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x87ceeb); // 空色
+// ===== プロコン接続 =====
+window.addEventListener("gamepadconnected", (e) => {
+  padIndex = e.gamepad.index;
+  console.log("プロコン接続");
+});
 
-  // カメラ
+// ===== 3D初期化 =====
+function init3D() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb);
+
   camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
@@ -29,20 +31,16 @@ function init3D() {
     1000
   );
   camera.position.set(0, 6, 10);
-  camera.lookAt(0, 0, 0);
 
-  // レンダラー
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
   // 光
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(5, 10, 5);
-  scene.add(light);
+  scene.add(new THREE.DirectionalLight(0xffffff, 1).position.set(5, 10, 5));
   scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-  // 床（マップ）
+  // 床
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(50, 50),
     new THREE.MeshStandardMaterial({ color: 0x228b22 })
@@ -50,15 +48,14 @@ function init3D() {
   floor.rotation.x = -Math.PI / 2;
   scene.add(floor);
 
-  // 箱（建物・オブジェクト）
-  const box = new THREE.Mesh(
-    new THREE.BoxGeometry(2, 2, 2),
-    new THREE.MeshStandardMaterial({ color: 0x8b4513 })
+  // ===== プレイヤー（キャラ）=====
+  player = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 2, 1),
+    new THREE.MeshStandardMaterial({ color: 0x0000ff })
   );
-  box.position.set(0, 1, 0);
-  scene.add(box);
+  player.position.y = 1;
+  scene.add(player);
 
-  // 画面サイズ変更対応
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -66,8 +63,35 @@ function init3D() {
   });
 }
 
+// ===== メインループ =====
 function animate() {
   if (!started) return;
   requestAnimationFrame(animate);
+
+  updatePlayer();
+  updateCamera();
+
   renderer.render(scene, camera);
+}
+
+// ===== プレイヤー操作 =====
+function updatePlayer() {
+  if (padIndex === null) return;
+
+  const pad = navigator.getGamepads()[padIndex];
+  if (!pad) return;
+
+  const speed = 0.15;
+  const x = pad.axes[0]; // 左スティック左右
+  const y = pad.axes[1]; // 左スティック上下
+
+  if (Math.abs(x) > 0.15) player.position.x += x * speed;
+  if (Math.abs(y) > 0.15) player.position.z += y * speed;
+}
+
+// ===== カメラ追従 =====
+function updateCamera() {
+  camera.position.x = player.position.x;
+  camera.position.z = player.position.z + 10;
+  camera.lookAt(player.position);
 }
