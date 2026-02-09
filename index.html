@@ -1,28 +1,22 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <title>Mech Shooter</title>
-
-  <link rel="manifest" href="manifest.json">
-
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: black;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>My RPG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <script type="module" src="./renderer.js"></script>
 
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js");
-    }
-  </script>
+  <!-- タイトル画面 -->
+  <div id="titleScreen">
+    <h1>MY RPG</h1>
+    <button id="startBtn">▶ はじめる</button>
+  </div>
+
+  <!-- ゲーム画面 -->
+  <canvas id="gameCanvas" width="800" height="450"></canvas>
+
+  <script src="main.js"></script>
 </body>
 </html>
