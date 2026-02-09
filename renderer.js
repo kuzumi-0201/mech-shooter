@@ -1,39 +1,68 @@
-let padIndex = null;
+let scene, camera, renderer;
 let started = false;
 
+// スタートボタン
 const startBtn = document.getElementById("start");
-
 startBtn.addEventListener("click", () => {
-  started = true;
   startBtn.style.display = "none";
-  document.body.style.background = "#222";
-  document.body.innerHTML = "<h1>🎮 ゲーム中</h1><p>プロコン操作を確認中…</p>";
+  started = true;
+  init3D();
+  animate();
   document.documentElement.requestFullscreen?.();
 });
 
-// プロコン接続検知
-window.addEventListener("gamepadconnected", (e) => {
-  padIndex = e.gamepad.index;
-  alert("プロコン認識！");
-  requestAnimationFrame(loop);
-});
+function init3D() {
+  // シーン
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb); // 空色
 
-function loop() {
-  if (!started) {
-    requestAnimationFrame(loop);
-    return;
-  }
+  // カメラ
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(0, 5, 10);
+  camera.lookAt(0, 0, 0);
 
-  const pad = navigator.getGamepads()[padIndex];
-  if (pad) {
-    pad.buttons.forEach((b, i) => {
-      if (b.pressed) {
-        console.log("押されたボタン番号:", i);
-        document.body.innerHTML =
-          `<h1>🎮 ゲーム中</h1><p>ボタン ${i} が押された！</p>`;
-      }
-    });
-  }
+  // レンダラー
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-  requestAnimationFrame(loop);
+  // 光
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 10, 5);
+  scene.add(light);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+  // 床（マップ）
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(50, 50),
+    new THREE.MeshStandardMaterial({ color: 0x228b22 })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  scene.add(floor);
+
+  // 箱（建物・木の代わり）
+  const box = new THREE.Mesh(
+    new THREE.BoxGeometry(2, 2, 2),
+    new THREE.MeshStandardMaterial({ color: 0x8b4513 })
+  );
+  box.position.set(0, 1, 0);
+  scene.add(box);
+
+  // 画面リサイズ対応
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+
+function animate() {
+  if (!started) return;
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
 }
