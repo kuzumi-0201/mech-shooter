@@ -4,20 +4,11 @@ let padIndex = null;
 const colliders = [];
 
 // スタート
-const startBtn = document.getElementById("start");
-startBtn.addEventListener("click", () => {
-  startBtn.style.display = "none";
-  requestFullscreen();
+document.getElementById("start").addEventListener("click", () => {
+  document.getElementById("start").style.display = "none";
   init();
   animate();
 });
-
-// フルスクリーン
-function requestFullscreen() {
-  if (document.body.requestFullscreen) {
-    document.body.requestFullscreen();
-  }
-}
 
 // ゲームパッド
 window.addEventListener("gamepadconnected", (e) => {
@@ -26,32 +17,36 @@ window.addEventListener("gamepadconnected", (e) => {
 
 // 初期化
 function init() {
+  // シーン
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0f1f);
+  scene.background = new THREE.Color(0x87ceeb); // 青空（見やすさ優先）
 
+  // カメラ（城塞が必ず見える位置）
   camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
     0.1,
     200
   );
+  camera.position.set(0, 8, 15);
 
+  // レンダラー
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // 光（近未来感）
-  scene.add(new THREE.AmbientLight(0x8899ff, 0.4));
+  // 光
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(10, 20, 10);
   scene.add(light);
 
-  // 床
+  // 地面（明るい）
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(100, 100),
     new THREE.MeshStandardMaterial({
-      color: 0x111111,
+      color: 0x55aa55,
       side: THREE.DoubleSide
     })
   );
@@ -60,56 +55,54 @@ function init() {
 
   // プレイヤー（人形）
   player = createDoll();
-  player.position.set(0, 0, 10);
+  player.position.set(0, 0, 8);
   scene.add(player);
 
-  // 城塞（拠点）
+  // 城塞
   createFortress();
 }
 
-// 人形プレイヤー
+// 人形
 function createDoll() {
   const group = new THREE.Group();
 
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xdddddd });
+  const mat = new THREE.MeshStandardMaterial({ color: 0xff5555 });
 
-  const torso = new THREE.Mesh(
-    new THREE.BoxGeometry(0.8, 1.2, 0.4),
-    bodyMat
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1.5, 0.6),
+    mat
   );
-  torso.position.y = 1.6;
+  body.position.y = 1.25;
 
   const head = new THREE.Mesh(
-    new THREE.BoxGeometry(0.6, 0.6, 0.6),
-    bodyMat
+    new THREE.BoxGeometry(0.7, 0.7, 0.7),
+    mat
   );
-  head.position.y = 2.5;
+  head.position.y = 2.4;
 
-  group.add(torso, head);
-  group.userData.radius = 0.6; // 当たり判定用
-
+  group.add(body, head);
   return group;
 }
 
-// 城塞作成
+// 城塞
 function createFortress() {
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x334455 });
+  const mat = new THREE.MeshStandardMaterial({ color: 0x8888ff });
 
-  // 中央建物（武器作成）
+  // 中央建物
   const core = new THREE.Mesh(
     new THREE.BoxGeometry(6, 4, 6),
-    wallMat
+    mat
   );
   core.position.set(0, 2, 0);
   scene.add(core);
   colliders.push(core);
 
-  // 左塔（クエスト受付）
+  // サブ塔
   const tower = new THREE.Mesh(
     new THREE.BoxGeometry(3, 5, 3),
-    wallMat
+    mat
   );
-  tower.position.set(-6, 2.5, 0);
+  tower.position.set(-7, 2.5, 0);
   scene.add(tower);
   colliders.push(tower);
 }
@@ -118,41 +111,37 @@ function createFortress() {
 function animate() {
   requestAnimationFrame(animate);
 
-  let moveX = 0;
-  let moveZ = 0;
+  let dx = 0, dz = 0;
 
   if (padIndex !== null) {
     const pad = navigator.getGamepads()[padIndex];
     if (pad) {
-      moveX = pad.axes[0] * 0.15;
-      moveZ = pad.axes[1] * 0.15;
+      dx = pad.axes[0] * 0.15;
+      dz = pad.axes[1] * 0.15;
     }
   }
 
-  const nextPos = player.position.clone();
-  nextPos.x += moveX;
-  nextPos.z += moveZ;
+  const next = player.position.clone();
+  next.x += dx;
+  next.z += dz;
 
-  if (!checkCollision(nextPos)) {
-    player.position.copy(nextPos);
+  if (!hit(next)) {
+    player.position.copy(next);
   }
 
   // カメラ追従
-  camera.position.set(
-    player.position.x,
-    player.position.y + 4,
-    player.position.z + 8
-  );
+  camera.position.x = player.position.x;
+  camera.position.z = player.position.z + 12;
+  camera.position.y = 8;
   camera.lookAt(player.position);
 
   renderer.render(scene, camera);
 }
 
 // 当たり判定
-function checkCollision(nextPos) {
-  for (const obj of colliders) {
-    const dist = nextPos.distanceTo(obj.position);
-    if (dist < 4) return true;
+function hit(pos) {
+  for (const o of colliders) {
+    if (pos.distanceTo(o.position) < 4) return true;
   }
   return false;
 }
